@@ -154,7 +154,7 @@ static bool PollDirChanges(std::wstring dir, ReloadDLL* rlcpp = nullptr, bool* p
 			*pauser = true;
 		}
 
-		reBuilt = RebuildBatch(L"C:\\Users\\cayde\\Documents\\GitHub\\dllRebuildTest\\testDLL\\ReBuildDLL.bat");
+		reBuilt = RebuildBatch(dir + L"\\ReBuildDLL.bat");
 
 		if (!reBuilt) {
 			std::cout << "MSBuild failed or returned non-zero exit code!\n";
@@ -199,8 +199,10 @@ int main(int argc, char** argv)
 
 	auto reload_ptr = (decltype(TestFunc)*)rcpp.Procs["TestFunc"];
 
+	EraseNDoubleSlashes(directory, 3);
+
 	// need to try getting this automatically, as editor will be stored next to engine, can just use this dir -s a few // then just append the manual path
-	std::thread t(PollDirChanges, L"C:\\Users\\cayde\\Documents\\GitHub\\dllRebuildTest\\testDLL", &rcpp, &paused);
+	std::thread t(PollDirChanges, directory + L"testDLL", &rcpp, &paused);
 
 	while (running) {
 
