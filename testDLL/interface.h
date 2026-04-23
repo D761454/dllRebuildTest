@@ -17,3 +17,5 @@
 extern "C" DLL_API void TestFunc();
 
 extern "C" DLL_API void ChangeALIST(B& obj);
+
+extern "C" DLL_API A* MakeC();

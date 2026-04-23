@@ -191,7 +191,7 @@ int main(int argc, char** argv)
 	directory.erase(directory.find_last_of(L'\\') + 1);
 
 	rcpp.PathToDLL = directory + L"testDLL.dll";
-	rcpp.ProcsToLoad = { "TestFunc", "ChangeALIST"};
+	rcpp.ProcsToLoad = { "TestFunc", "ChangeALIST", "MakeC" };
 
 	PollDLLChanges(rcpp);
 
@@ -200,6 +200,7 @@ int main(int argc, char** argv)
 
 	auto reload_ptr = (decltype(TestFunc)*)rcpp.Procs["TestFunc"];
 	auto obj_ptr = (decltype(ChangeALIST)*)rcpp.Procs["ChangeALIST"];
+	auto c_ptr = (decltype(MakeC)*)rcpp.Procs["MakeC"];
 
 	EraseNDoubleSlashes(directory, 3);
 
@@ -213,6 +214,14 @@ int main(int argc, char** argv)
 	B testObj;
 
 	testObj.aList.push_back(new A);
+
+	if (c_ptr) {
+		A* temp = c_ptr();
+
+		temp->Speak();
+
+		delete temp;
+	}
 
 	while (running) {
 		auto b = std::chrono::system_clock::now();

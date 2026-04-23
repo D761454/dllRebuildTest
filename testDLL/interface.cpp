@@ -12,3 +12,7 @@ void ChangeALIST(B& obj) {
 
 	obj.aList.push_back(new C);
 }
+
+A* MakeC() {
+	return new C;
+}
