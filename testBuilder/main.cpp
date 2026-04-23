@@ -10,7 +10,7 @@
 // most game functionality handled by user scripts on game objects
 // will likely need to store editor in same dir / close to engine project for easy include and rebuilds
 #include "../testDLL/interface.h"
-#include <thread>
+#include "TPool.h"
 
 #include <chrono>
 
@@ -86,7 +86,7 @@ static void EraseNDoubleSlashes(std::wstring& dir, int n) {
 }
 
 // can add an update ptr function in here to auto update all method ptrs
-void PollDLLChanges(ReloadDLL& rcpp) {
+static void PollDLLChanges(ReloadDLL& rcpp) {
 	// open
 	HANDLE hDLLFile = CreateFileW(rcpp.PathToDLL.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hDLLFile == INVALID_HANDLE_VALUE)
@@ -202,7 +202,9 @@ int main(int argc, char** argv)
 	EraseNDoubleSlashes(directory, 3);
 
 	// need to try getting this automatically, as editor will be stored next to engine, can just use this dir -s a few // then just append the manual path
-	std::thread t(PollDirChanges, directory + L"testDLL", &rcpp, &paused);
+	//std::thread t(PollDirChanges, directory + L"testDLL", &rcpp, &paused);
+
+	GetWatcherThread()->SetWJob(std::bind(&PollDirChanges, directory + L"testDLL", &rcpp, &paused));
 
 	int i = 0;
 	int max = 20;
