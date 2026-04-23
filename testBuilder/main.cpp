@@ -204,6 +204,9 @@ int main(int argc, char** argv)
 	// need to try getting this automatically, as editor will be stored next to engine, can just use this dir -s a few // then just append the manual path
 	std::thread t(PollDirChanges, directory + L"testDLL", &rcpp, &paused);
 
+	int i = 0;
+	int max = 20;
+
 	while (running) {
 
 		/*char c;
@@ -228,7 +231,20 @@ int main(int argc, char** argv)
 			}
 		}
 		else {
-			std::cout << "-----------------------------------" << std::endl;
+			// loading bar ""
+			system("cls");
+			for (int j = i; j--;) {
+				std::cout << "#";
+			}
+			for (int j = i; j < max; j++) {
+				std::cout << "-";
+			}
+			std::cout << std::endl;
+			i++;
+			if (i > max) {
+				i = 0;
+			}
+			Sleep(250);
 			reload_ptr = (decltype(TestFunc)*)rcpp.Procs["TestFunc"];
 		}
 
@@ -242,7 +258,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	t.join();
+	//t.join();
 
 	return 0;
 }

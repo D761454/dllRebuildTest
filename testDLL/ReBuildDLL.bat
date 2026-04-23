@@ -11,6 +11,7 @@ rem specify platform as editor that calls this script will only be on windows so
 set "PLATFORM=x64"
 set CONFIGURATION=Release
 
+rem wont need when doing .sln, however, if doing .vcxproj and calling from .exe and not vs, remove \x64\%CONFIGURATION%
 set "CONSUMER_OUT=%CD%\x64\%CONFIGURATION%"
 
 rem use vswhere to find VS installation
