@@ -11,6 +11,7 @@
 // will likely need to store editor in same dir / close to engine project for easy include and rebuilds
 #include "../testDLL/interface.h"
 #include "Watcher.h"
+#include "Benz.h"
 
 #include <chrono>
 
@@ -190,7 +191,7 @@ int main(int argc, char** argv)
 	directory.erase(directory.find_last_of(L'\\') + 1);
 
 	rcpp.PathToDLL = directory + L"testDLL.dll";
-	rcpp.ProcsToLoad = { "TestFunc" };
+	rcpp.ProcsToLoad = { "TestFunc", "ChangeALIST"};
 
 	PollDLLChanges(rcpp);
 
@@ -198,6 +199,7 @@ int main(int argc, char** argv)
 	bool paused = false;
 
 	auto reload_ptr = (decltype(TestFunc)*)rcpp.Procs["TestFunc"];
+	auto obj_ptr = (decltype(ChangeALIST)*)rcpp.Procs["ChangeALIST"];
 
 	EraseNDoubleSlashes(directory, 3);
 
@@ -207,6 +209,10 @@ int main(int argc, char** argv)
 	int max = 20;
 
 	float dt = 0.0f;
+
+	B testObj;
+
+	testObj.aList.push_back(new A);
 
 	while (running) {
 		auto b = std::chrono::system_clock::now();
@@ -229,8 +235,10 @@ int main(int argc, char** argv)
 
 		if (!paused) {
 			if (reload_ptr) {
-				reload_ptr();
+				//reload_ptr();
 			}
+
+			testObj.aList.back()->Speak();
 			i = 0;
 
 			auto e = std::chrono::system_clock::now();
@@ -256,6 +264,10 @@ int main(int argc, char** argv)
 
 			Sleep(sleep);
 			reload_ptr = (decltype(TestFunc)*)rcpp.Procs["TestFunc"];
+			obj_ptr = (decltype(ChangeALIST)*)rcpp.Procs["ChangeALIST"];
+			if (obj_ptr && testObj.aList.back()->integer != 2) {
+				obj_ptr(testObj);
+			}
 		}
 
 		auto now = std::chrono::system_clock::now();

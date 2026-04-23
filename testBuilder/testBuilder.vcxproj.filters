@@ -26,5 +26,8 @@
     <ClInclude Include="Watcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Benz.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

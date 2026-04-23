@@ -23,6 +23,7 @@
     <ClCompile Include="Watcher.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Benz.h" />
     <ClInclude Include="Watcher.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
