@@ -2,5 +2,5 @@
 #include <cstdio>
 
 void TestFunc() {
-	printf("base\n");
+	printf("build\n");
 }

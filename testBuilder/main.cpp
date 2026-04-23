@@ -206,7 +206,10 @@ int main(int argc, char** argv)
 	int i = 0;
 	int max = 20;
 
+	float dt = 0.0f;
+
 	while (running) {
+		auto b = std::chrono::system_clock::now();
 
 		/*char c;
 
@@ -228,6 +231,10 @@ int main(int argc, char** argv)
 			if (reload_ptr) {
 				reload_ptr();
 			}
+			i = 0;
+
+			auto e = std::chrono::system_clock::now();
+			dt = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(e - b).count();
 		}
 		else {
 			// loading bar ""
@@ -243,7 +250,11 @@ int main(int argc, char** argv)
 			if (i > max) {
 				i = 0;
 			}
-			Sleep(250);
+			int sleep = (1500 * dt);
+			std::cout << dt << std::endl;
+			std::cout << sleep << std::endl;
+
+			Sleep(sleep);
 			reload_ptr = (decltype(TestFunc)*)rcpp.Procs["TestFunc"];
 		}
 
