@@ -20,10 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="TPool.cpp" />
+    <ClCompile Include="Watcher.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TPool.h" />
+    <ClInclude Include="Watcher.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
