@@ -5,12 +5,16 @@
 #include <string>
 #include <sstream>
 #include <map>
+// on build, engine and game mains will need access to engine dll headers to get funcs on build
+// presumably will only need access to the engine update loop to call it as everything will ideally be handled by engine e.g. load 1st scene / start scene, then enter main loop
+// most game functionality handled by user scripts on game objects
+// will likely need to store editor in same dir / close to engine project for easy include and rebuilds
 #include "../testDLL/interface.h"
 #include <thread>
 
 #include <chrono>
 
-struct ReloadCPP {
+struct ReloadDLL {
 	std::wstring PathToDLL;
 	std::vector<std::string> ProcsToLoad;
 
@@ -22,6 +26,7 @@ struct ReloadCPP {
 //https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw
 // To run a batch file, you must start the command interpreter; set lpApplicationName to cmd.exe
 // and set lpCommandLine to the following arguments: /c plus the name of the batch file.
+// ideally ran on a thread as will block program until done
 static bool RebuildBatch(const std::wstring& batchPath) {
 	// verify path
 	DWORD attrs = GetFileAttributesW(batchPath.c_str());
@@ -81,7 +86,7 @@ static void EraseNDoubleSlashes(std::wstring& dir, int n) {
 }
 
 // can add an update ptr function in here to auto update all method ptrs
-void PollDLLChanges(ReloadCPP& rcpp) {
+void PollDLLChanges(ReloadDLL& rcpp) {
 	// open
 	HANDLE hDLLFile = CreateFileW(rcpp.PathToDLL.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hDLLFile == INVALID_HANDLE_VALUE)
@@ -122,23 +127,21 @@ void PollDLLChanges(ReloadCPP& rcpp) {
 	CloseHandle(hDLLFile);
 }
 
-static bool PollDirChanges(std::wstring dir, ReloadCPP* rlcpp = nullptr, bool* pauser = nullptr) {
+static bool PollDirChanges(std::wstring dir, ReloadDLL* rlcpp = nullptr, bool* pauser = nullptr) {
 	// https://learn.microsoft.com/en-us/windows/win32/fileio/obtaining-directory-change-notifications
 	if (pauser) {
 		*pauser = false;
 	}
 
-	HANDLE dchanges[3];
-	dchanges[0] = FindFirstChangeNotificationW(dir.c_str(), true, FILE_NOTIFY_CHANGE_FILE_NAME);
-	dchanges[1] = FindFirstChangeNotificationW(dir.c_str(), true, FILE_NOTIFY_CHANGE_DIR_NAME);
-	dchanges[2] = FindFirstChangeNotificationW(dir.c_str(), true, FILE_NOTIFY_CHANGE_LAST_WRITE);
+	HANDLE dchanges;
+	dchanges = FindFirstChangeNotificationW(dir.c_str(), true, FILE_NOTIFY_CHANGE_LAST_WRITE);
 
-	if (dchanges[0] == INVALID_HANDLE_VALUE || dchanges[1] == INVALID_HANDLE_VALUE || dchanges[2] == INVALID_HANDLE_VALUE)
+	if (dchanges == INVALID_HANDLE_VALUE)
 	{
 		return false;
 	}
 
-	DWORD dwWaitStatus = WaitForMultipleObjects(3, dchanges, FALSE, INFINITE);
+	DWORD dwWaitStatus = WaitForSingleObject(dchanges, INFINITE);
 
 	bool reBuilt = false;
 
@@ -181,7 +184,7 @@ int main(int argc, char** argv)
 {
 	auto start = std::chrono::system_clock::now();
 
-	ReloadCPP rcpp;
+	ReloadDLL rcpp;
 
 	std::wstring directory(argv[0], argv[0] + strlen(argv[0]));
 	directory.erase(directory.find_last_of(L'\\') + 1);
@@ -196,6 +199,7 @@ int main(int argc, char** argv)
 
 	auto reload_ptr = (decltype(TestFunc)*)rcpp.Procs["TestFunc"];
 
+	// need to try getting this automatically, as editor will be stored next to engine, can just use this dir -s a few // then just append the manual path
 	std::thread t(PollDirChanges, L"C:\\Users\\cayde\\Documents\\GitHub\\dllRebuildTest\\testDLL", &rcpp, &paused);
 
 	while (running) {
