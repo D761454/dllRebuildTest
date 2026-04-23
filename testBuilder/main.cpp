@@ -10,7 +10,7 @@
 // most game functionality handled by user scripts on game objects
 // will likely need to store editor in same dir / close to engine project for easy include and rebuilds
 #include "../testDLL/interface.h"
-#include "TPool.h"
+#include "Watcher.h"
 
 #include <chrono>
 
@@ -201,9 +201,6 @@ int main(int argc, char** argv)
 
 	EraseNDoubleSlashes(directory, 3);
 
-	// need to try getting this automatically, as editor will be stored next to engine, can just use this dir -s a few // then just append the manual path
-	//std::thread t(PollDirChanges, directory + L"testDLL", &rcpp, &paused);
-
 	GetWatcherThread()->SetWJob(std::bind(&PollDirChanges, directory + L"testDLL", &rcpp, &paused));
 
 	int i = 0;
@@ -259,8 +256,6 @@ int main(int argc, char** argv)
 			// just clean as obv can just press x to close program
 		}
 	}
-
-	//t.join();
 
 	return 0;
 }

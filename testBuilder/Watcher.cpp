@@ -1,4 +1,4 @@
-#include "TPool.h"
+#include "Watcher.h"
 
 WatcherThread::WatcherThread() {
 	m_thread = new std::thread([this] {
@@ -15,10 +15,7 @@ WatcherThread::WatcherThread() {
 				return m_hasJob || m_exit;
 				});
 
-			// if tasks available, get the next one
-			job = std::move(m_job);
-
-			job();
+			m_job();
 		}
 		});
 }
