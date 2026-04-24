@@ -2,7 +2,8 @@
 #include <vector>
 #include <memory>
 #include <iostream>
-#include "../testBuilder/Benz.h"
+
+#include "object.h"
 
 #ifdef TESTDLL_EXPORTS
 // windows exclusive, dont need for linux when building engine dll for game as linux exports all - idk abt apple tho
@@ -14,8 +15,8 @@
 #define DLL_API __declspec(dllimport)
 #endif
 
+#define REG(comp, factory, list) if (std::find(list.begin(), list.end(), comp::GetType()) == list.end()) { factory t; sro->m_componentFactories.RegisterFactory(comp::GetType(), std::make_unique<factory>(t)); }
+
 extern "C" DLL_API void TestFunc();
 
-extern "C" DLL_API void ChangeALIST(B& obj);
-
-extern "C" DLL_API A* MakeC();
+extern "C" DLL_API void Register(World::Objects::SceneRootObject* sro);

@@ -5,13 +5,15 @@
 #include <string>
 #include <sstream>
 #include <map>
+
+#include "CameraComponent.h"
+
 // on build, engine and game mains will need access to engine dll headers to get funcs on build
 // presumably will only need access to the engine update loop to call it as everything will ideally be handled by engine e.g. load 1st scene / start scene, then enter main loop
 // most game functionality handled by user scripts on game objects
 // will likely need to store editor in same dir / close to engine project for easy include and rebuilds
 #include "../testDLL/interface.h"
 #include "Watcher.h"
-#include "Benz.h"
 
 #include <chrono>
 
@@ -183,6 +185,8 @@ static bool PollDirChanges(std::wstring dir, ReloadDLL* rlcpp = nullptr, bool* p
 
 int main(int argc, char** argv)
 {
+	REGISTER_FACTORY(CameraFactory, Components::CameraComponent);
+
 	auto start = std::chrono::system_clock::now();
 
 	ReloadDLL rcpp;
@@ -191,7 +195,7 @@ int main(int argc, char** argv)
 	directory.erase(directory.find_last_of(L'\\') + 1);
 
 	rcpp.PathToDLL = directory + L"testDLL.dll";
-	rcpp.ProcsToLoad = { "TestFunc", "ChangeALIST", "MakeC" };
+	rcpp.ProcsToLoad = { "TestFunc", "Register" };
 
 	PollDLLChanges(rcpp);
 
@@ -199,8 +203,7 @@ int main(int argc, char** argv)
 	bool paused = false;
 
 	auto reload_ptr = (decltype(TestFunc)*)rcpp.Procs["TestFunc"];
-	auto obj_ptr = (decltype(ChangeALIST)*)rcpp.Procs["ChangeALIST"];
-	auto c_ptr = (decltype(MakeC)*)rcpp.Procs["MakeC"];
+	auto reg_ptr = (decltype(Register)*)rcpp.Procs["Register"];
 
 	EraseNDoubleSlashes(directory, 3);
 
@@ -211,43 +214,26 @@ int main(int argc, char** argv)
 
 	float dt = 0.0f;
 
-	B testObj;
+	World::Objects::Object* child = World::Objects::SceneRootObject::GetInstance().CreateChild("ChildObj");
 
-	testObj.aList.push_back(new A);
+	std::cout << child->m_name << std::endl;
 
-	if (c_ptr) {
-		A* temp = c_ptr();
+	child->AddComponent<Components::CameraComponent>();
 
-		temp->Speak();
-
-		delete temp;
+	if (reg_ptr) {
+		reg_ptr(&World::Objects::SceneRootObject::GetInstance());
 	}
+
+	World::Objects::SceneRootObject::GetInstance().m_componentFactories.Create("testcomponent", child);
 
 	while (running) {
 		auto b = std::chrono::system_clock::now();
-
-		/*char c;
-
-		std::cin >> c;
-
-		if (c == 'r') {
-			reload_ptr = (decltype(TestFunc)*)rcpp.Procs["TestFunc"];
-		}
-		else if (c == 't') {
-			if (reload_ptr) {
-				reload_ptr();
-			}
-		}
-		else if (c == 'e') {
-			running = false;
-		}*/
 
 		if (!paused) {
 			if (reload_ptr) {
 				//reload_ptr();
 			}
 
-			testObj.aList.back()->Speak();
 			i = 0;
 
 			auto e = std::chrono::system_clock::now();
@@ -273,10 +259,6 @@ int main(int argc, char** argv)
 
 			Sleep(sleep);
 			reload_ptr = (decltype(TestFunc)*)rcpp.Procs["TestFunc"];
-			obj_ptr = (decltype(ChangeALIST)*)rcpp.Procs["ChangeALIST"];
-			if (obj_ptr && testObj.aList.back()->integer != 2) {
-				obj_ptr(testObj);
-			}
 		}
 
 		auto now = std::chrono::system_clock::now();

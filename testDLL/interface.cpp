@@ -1,18 +1,14 @@
 #include "interface.h"
 #include <cstdio>
-#include "C.h"
+
+#include "testcomponent.h"
 
 void TestFunc() {
 	printf("base\n");
 }
 
-void ChangeALIST(B& obj) {
-	delete obj.aList.back();
-	obj.aList.clear();
+void Register(World::Objects::SceneRootObject* sro) {
+	std::vector<std::string> faclist = sro->m_componentFactories.GetTypes();
 
-	obj.aList.push_back(new C);
-}
-
-A* MakeC() {
-	return new C;
+	REG(Components::testcomponent, testcomponentFactory, faclist)
 }

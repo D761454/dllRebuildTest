@@ -23,8 +23,12 @@
     <ClCompile Include="Watcher.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Benz.h" />
     <ClInclude Include="Watcher.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\worldSL\worldSL.vcxproj">
+      <Project>{9050ee92-1084-473d-a69c-e646675b507e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -120,6 +124,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)../worldSL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -140,6 +145,7 @@
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(SolutionDir)../worldSL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
