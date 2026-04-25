@@ -141,6 +141,7 @@ static bool PollDirChanges(std::wstring dir, ReloadDLL* rlcpp = nullptr, bool* p
 
 	if (dchanges == INVALID_HANDLE_VALUE)
 	{
+		CloseHandle(dchanges);
 		return false;
 	}
 
@@ -180,6 +181,7 @@ static bool PollDirChanges(std::wstring dir, ReloadDLL* rlcpp = nullptr, bool* p
 		break;
 	}
 
+	CloseHandle(dchanges);
 	return reBuilt;
 }
 
@@ -231,7 +233,7 @@ int main(int argc, char** argv)
 
 		if (!paused) {
 			if (reload_ptr) {
-				//reload_ptr();
+				reload_ptr();
 			}
 
 			i = 0;
